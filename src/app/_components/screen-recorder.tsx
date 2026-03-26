@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -13,20 +13,6 @@ export function ScreenRecorder() {
 
   const wsRef = useRef<WebSocket | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
-
-  function download(recordedChunks: Blob[]) {
-    const blob = new Blob(recordedChunks, {
-      type: "video/webm",
-    });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    document.body.appendChild(a);
-    a.style = "display: none";
-    a.href = url;
-    a.download = "test.webm";
-    a.click();
-    URL.revokeObjectURL(url);
-  }
 
   const startRecording = async () => {
     wsRef.current = new WebSocket(
