@@ -62,7 +62,15 @@ export function ScreenRecorder() {
         mediaRecorder.ondataavailable = async (event) => {
           if (event.data.size > 0) {
             const arrayBuffer = await event.data.arrayBuffer();
-            wsRef.current?.send(arrayBuffer);
+
+            if (wsRef.current?.readyState === WebSocket.OPEN) {
+              wsRef.current?.send(arrayBuffer);
+            }
+          }
+
+          // closing the connection makes the server to stop recording
+          if (mediaRecorder.state === "inactive") {
+            wsRef.current?.close();
           }
         };
 
@@ -82,9 +90,6 @@ export function ScreenRecorder() {
       // recording will stop automatically when the stream is stopped
       // https://developer.mozilla.org/en-US/docs/Web/API/MediaStream_Recording_API#overview_of_the_recording_process
       stopDisplayCapture(streamRef.current);
-
-      // closing the connection makes the server to stop recording
-      wsRef.current?.close();
     }
   };
 
