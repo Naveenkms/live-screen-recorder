@@ -18,18 +18,18 @@ export function ScreenRecorder() {
   const startRecording = async () => {
     const { token } = await getAccessToken();
 
-    // if (!token) {
-    //   toast.error("You are not logged in");
-    //   return;
-    // }
+    if (!token) {
+      toast.error("You are not logged in");
+      return;
+    }
 
     wsRef.current = new WebSocket(
       (process.env.NEXT_PUBLIC_WS_URL || "ws://localhost:8080") +
-        `?token=${encodeURI(token)}`,
+        `?token=${encodeURIComponent(token)}`,
     );
 
     wsRef.current.onerror = (event) => {
-      console.error("WebSocket error: ", event);
+      console.error(event);
       toast.error("WebSocket error");
     };
 
@@ -88,7 +88,7 @@ export function ScreenRecorder() {
         stopDisplayCapture(streamRef.current);
       }
     };
-  };  
+  };
 
   const stopRecording = () => {
     if (streamRef.current?.active) {
