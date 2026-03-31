@@ -5,6 +5,7 @@ import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { startDisplayCapture, stopDisplayCapture } from "@/lib/utils";
+import { getAccessToken } from "@/lib/server-functions";
 
 const TIME_SLICE = 2000;
 
@@ -15,8 +16,16 @@ export function ScreenRecorder() {
   const streamRef = useRef<MediaStream | null>(null);
 
   const startRecording = async () => {
+    const { token } = await getAccessToken();
+
+    // if (!token) {
+    //   toast.error("You are not logged in");
+    //   return;
+    // }
+
     wsRef.current = new WebSocket(
-      process.env.NEXT_PUBLIC_WS_URL || "ws://localhost:8080",
+      (process.env.NEXT_PUBLIC_WS_URL || "ws://localhost:8080") +
+        `?token=${encodeURI(token)}`,
     );
 
     wsRef.current.onerror = (event) => {
@@ -38,8 +47,6 @@ export function ScreenRecorder() {
       }
 
       if (stream) {
-        const recordedChunks: Blob[] = [];
-
         streamRef.current = stream;
 
         const options = { mimeType: "video/webm; codecs=vp9" };
@@ -56,7 +63,10 @@ export function ScreenRecorder() {
 
           // closing the connection makes the server to stop recording
           if (mediaRecorder.state === "inactive") {
-            wsRef.current?.close();
+            console.log("Media recorder is inactive");
+            if (wsRef.current?.readyState === WebSocket.OPEN) {
+              wsRef.current?.close();
+            }
           }
         };
 
@@ -69,10 +79,19 @@ export function ScreenRecorder() {
         };
       }
     };
-  };
+
+    wsRef.current.onclose = () => {
+      console.log("WebSocket connection closed");
+      // stop capturing, if socket connection closed for some reason
+      // eg: connection can be closed, if the user is unauthenticated
+      if (streamRef.current?.active) {
+        stopDisplayCapture(streamRef.current);
+      }
+    };
+  };  
 
   const stopRecording = () => {
-    if (streamRef.current) {
+    if (streamRef.current?.active) {
       // recording will stop automatically when the stream is stopped
       // https://developer.mozilla.org/en-US/docs/Web/API/MediaStream_Recording_API#overview_of_the_recording_process
       stopDisplayCapture(streamRef.current);

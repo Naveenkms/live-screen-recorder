@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist } from "next/font/google";
+import { Auth0Provider } from "@auth0/nextjs-auth0/client";
 
 import "@/styles/globals.css";
 import { Toaster } from "@/components/ui/sonner";
@@ -22,7 +23,10 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${geistSans.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col">
-        {children} <Toaster />
+        <Auth0Provider>
+          {children}
+        </Auth0Provider>
+        <Toaster />
       </body>
     </html>
   );
