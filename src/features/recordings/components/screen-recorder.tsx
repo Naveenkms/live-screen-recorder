@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { startDisplayCapture, stopDisplayCapture } from "@/lib/utils";
 import { getAccessToken } from "@/lib/server-functions";
+import RecordingIndicatorIcon from "./recording-indicator-icon";
 
 const TIME_SLICE = 2000;
 
@@ -99,11 +100,14 @@ export function ScreenRecorder() {
   };
 
   return (
-    <Button
-      variant="destructive"
-      onClick={isRecording ? stopRecording : startRecording}
-    >
-      {isRecording ? "Stop Recording" : "Start Recording"}
-    </Button>
+    <>
+      <Button
+        variant="destructive"
+        onClick={isRecording ? stopRecording : startRecording}
+      >
+        <RecordingIndicatorIcon status={isRecording ? "recording" : "not-recording"} />
+        {isRecording ? "Stop Recording" : "Start Recording"}
+      </Button>
+    </>
   );
 }
