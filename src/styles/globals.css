@@ -3,6 +3,9 @@
 @import "shadcn/tailwind.css";
 
 @custom-variant dark (&:is(.dark *));
+@custom-variant data-recording (&[data-state="recording"]);
+@custom-variant data-not-recording (&[data-state="not-recording"]);
+
 
 @theme inline {
   --color-brand: var(--brand);
