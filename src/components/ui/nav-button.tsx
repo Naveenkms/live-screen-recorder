@@ -3,8 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-import { cn } from "@/lib/utils";
-import { buttonVariants } from "./button";
+import { Button } from "./button";
 
 export function NavButton({
   href,
@@ -15,13 +14,8 @@ export function NavButton({
 }) {
   const active = usePathname().startsWith(href);
   return (
-    <Link
-      href={href}
-      className={cn(
-        buttonVariants({ variant: active ? "secondary" : "ghost" }),
-      )}
-    >
-      {children}
-    </Link>
+    <Button asChild variant={active ? "secondary" : "ghost"}>
+      <Link href={href}>{children}</Link>
+    </Button>
   );
 }
